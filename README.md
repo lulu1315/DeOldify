@@ -12,6 +12,10 @@ model is an integer :
 to generate a video , I usually extract a sequence of .png to a folder , than process each frame and reencode the result sequence with ffmpeg.
 
 ```console
+ffmpeg -i original_video.mov originals/ima.%05d.png
+```
+
+```console
 #!/bin/bash
 start=550
 end=650
@@ -21,5 +25,9 @@ for i in `seq $start $end`;
         echo $ii
         python3 ImageColorizer.py 0 21 originals/ima.$ii.png deoldify/ima.$ii.png
     done 
+```
+
+```console
+ffmpeg -i deoldify/ima.%05d.png -c:v libx264 deoldify_video.mov
 ```
 
