@@ -30,4 +30,4 @@ for i in `seq $start $end`;
 ```console
 ffmpeg -i deoldify/ima.%05d.png -c:v libx264 deoldify_video.mov
 ```
-
+(you'll have to edit fasterai/visualize.py and change the harcoded path to your model directory)
