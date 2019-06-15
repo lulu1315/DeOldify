@@ -1,4 +1,4 @@
-# this is a simplified version of DeOldify that I modified to be used as a cli.
+this is a simplified version of DeOldify that I modified to be used as a cli.
 
 ```console
 usage : python3 ImageColorizer.py model render_factor input_image output_image
