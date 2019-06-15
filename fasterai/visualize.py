@@ -43,9 +43,10 @@ class ModelImageVisualizer():
         return self.plot_transformed_image(path=path, figsize=figsize, render_factor=render_factor, 
                                             display_render_factor=display_render_factor, compare=compare)
 
-    def plot_transformed_image(self, path:str, figsize:(int,int)=(20,20), render_factor:int=None, 
+    def plot_transformed_image(self, path:str, out_path:str, figsize:(int,int)=(20,20), render_factor:int=None, 
                             display_render_factor:bool=False, compare:bool=False)->Path:
         path = Path(path)
+        out_path = Path(out_path)
         result = self.get_transformed_image(path, render_factor)
         orig = self._open_pil_image(path)
         if compare: 
@@ -53,7 +54,7 @@ class ModelImageVisualizer():
         else:
             self._plot_solo(figsize, render_factor, display_render_factor, result)
 
-        return self._save_result_image(path, result)
+        return self._save_result_image(path, out_path, result)
 
     def _plot_comparison(self, figsize:(int,int), render_factor:int, display_render_factor:bool, orig:Image, result:Image):
         fig,axes = plt.subplots(1, 2, figsize=figsize)
@@ -64,10 +65,10 @@ class ModelImageVisualizer():
         fig,axes = plt.subplots(1, 1, figsize=figsize)
         self._plot_image(result, axes=axes, figsize=figsize, render_factor=render_factor, display_render_factor=display_render_factor)
 
-    def _save_result_image(self, source_path:Path, image:Image)->Path:
+    def _save_result_image(self, source_path:Path, out_path:Path, image:Image)->Path:
         result_path = self.results_dir/source_path.name
-        image.save(result_path)
-        return result_path
+        image.save(out_path)
+        return out_path
 
     def get_transformed_image(self, path:Path, render_factor:int=None)->Image:
         self._clean_mem()
@@ -189,27 +190,45 @@ class VideoColorizer():
 def get_video_colorizer(render_factor:int=21)->VideoColorizer:
     return get_stable_video_colorizer(render_factor=render_factor)
 
-def get_stable_video_colorizer(root_folder:Path=Path('./'), weights_name:str='ColorizeVideo_gen', 
+def get_stable_video_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
         results_dir='result_images', render_factor:int=21)->VideoColorizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
     vis = ModelImageVisualizer(filtr, results_dir=results_dir)
     return VideoColorizer(vis)
 
-def get_image_colorizer(render_factor:int=35, artistic:bool=True)->ModelImageVisualizer:
-    if artistic:
+def get_image_colorizer(render_factor:int=35, model_flag:int=0)->ModelImageVisualizer:
+    if model_flag == 1:
+        print ("using model : ColorizeArtistic_gen")
         return get_artistic_image_colorizer(render_factor=render_factor)
-    else:
+    if model_flag == 2:
+        print ("using model : ColorizeStable_gen")
         return get_stable_image_colorizer(render_factor=render_factor)
+    if model_flag == 0:
+        print ("using model : ColorizeVideo_gen")
+        return get_video_image_colorizer(render_factor=render_factor)
+    
+#def get_image_colorizer(render_factor:int=35, artistic:bool=True)->ModelImageVisualizer:
+#    if artistic:
+#        return get_artistic_image_colorizer(render_factor=render_factor)
+#    else:
+#        return get_stable_image_colorizer(render_factor=render_factor)
 
-def get_stable_image_colorizer(root_folder:Path=Path('./'), weights_name:str='ColorizeStable_gen', 
+def get_stable_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeStable_gen', 
         results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
     vis = ModelImageVisualizer(filtr, results_dir=results_dir)
     return vis
 
-def get_artistic_image_colorizer(root_folder:Path=Path('./'), weights_name:str='ColorizeArtistic_gen', 
+def get_video_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
+        results_dir='result_images', render_factor:int=21)->ModelImageVisualizer:
+    learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
+    filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
+    vis = ModelImageVisualizer(filtr, results_dir=results_dir)
+    return vis
+
+def get_artistic_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeArtistic_gen', 
         results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
     learn = gen_inference_deep(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
