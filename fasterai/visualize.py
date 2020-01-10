@@ -22,7 +22,7 @@ class ModelImageVisualizer():
     def __init__(self, filter:IFilter, results_dir:str=None):
         self.filter = filter
         self.results_dir=None if results_dir is None else Path(results_dir)
-        self.results_dir.mkdir(parents=True, exist_ok=True)
+        #self.results_dir.mkdir(parents=True, exist_ok=True)
     
     def _clean_mem(self):
         torch.cuda.empty_cache()
@@ -190,7 +190,7 @@ class VideoColorizer():
 def get_video_colorizer(render_factor:int=21)->VideoColorizer:
     return get_stable_video_colorizer(render_factor=render_factor)
 
-def get_stable_video_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
+def get_stable_video_colorizer(root_folder:Path=Path('/shared/foss-18/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
         results_dir='result_images', render_factor:int=21)->VideoColorizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
@@ -214,21 +214,21 @@ def get_image_colorizer(render_factor:int=35, model_flag:int=0)->ModelImageVisua
 #    else:
 #        return get_stable_image_colorizer(render_factor=render_factor)
 
-def get_stable_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeStable_gen', 
+def get_stable_image_colorizer(root_folder:Path=Path('/shared/foss-18/DeOldify/'), weights_name:str='ColorizeStable_gen', 
         results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
     vis = ModelImageVisualizer(filtr, results_dir=results_dir)
     return vis
 
-def get_video_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
+def get_video_image_colorizer(root_folder:Path=Path('/shared/foss-18/DeOldify/'), weights_name:str='ColorizeVideo_gen', 
         results_dir='result_images', render_factor:int=21)->ModelImageVisualizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
     vis = ModelImageVisualizer(filtr, results_dir=results_dir)
     return vis
 
-def get_artistic_image_colorizer(root_folder:Path=Path('/shared/foss/DeOldify/'), weights_name:str='ColorizeArtistic_gen', 
+def get_artistic_image_colorizer(root_folder:Path=Path('/shared/foss-18/DeOldify/'), weights_name:str='ColorizeArtistic_gen', 
         results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
     learn = gen_inference_deep(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
